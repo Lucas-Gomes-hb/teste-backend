@@ -100,5 +100,3 @@ Tive algumas dificuldades na instalação do ambiente, assim como de primeiro mo
 Algumas questões de alterações nos modelos de busca e de pesquisa fiquei receoso de mexer e construir, mas entendi que teria de construir do jeito que entendi como correto.
 
 E sobre o cadastro de um produto com mais de uma categoria fiquei na duvida pois de acordo com o modelo apresentado na doc da API, não teria como adicionar tentei de algumas maneiras implementar isso sem quebrar muito a estrutura, mas infelizmente não entendi como.
-
-Foi feita a tentativa também de integrar tudo em um sistema docker, mas creio que não tive sucesso.
