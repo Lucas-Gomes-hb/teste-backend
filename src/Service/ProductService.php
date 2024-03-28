@@ -12,15 +12,36 @@ class ProductService
         $this->pdo = DB::connect();
     }
 
-    public function getAll($adminUserId)
+    public function getAll($adminUserId, $filter)
     {
         $query = "
-            SELECT p.*, c.title as category
-            FROM product p
-            INNER JOIN product_category pc ON pc.product_id = p.id
-            INNER JOIN category c ON c.id = pc.id
-            WHERE p.company_id = {$adminUserId}
-        ";
+                SELECT p.*, c.title as category
+                FROM product p
+                INNER JOIN product_category pc ON pc.product_id = p.id
+                INNER JOIN category c ON c.id = pc.cat_id
+                WHERE p.company_id = {$adminUserId}
+                ";
+
+        switch ($filter) {
+            case 'active':
+                $query .= " AND p.active = 1";
+                break;
+            case 'desactive':
+                $query .= " AND p.active = 0";
+                break;
+            case str_starts_with($filter, "category:"):
+                $category = explode(":", $filter)[1];
+                $query .= " AND c.title = '{$category}'";
+                break;
+            case str_starts_with($filter, "date:"):
+                $type = explode(":", $filter)[1];
+                if ($type == "ascendent") {
+                    $query .= " ORDER BY p.created_at ASC";
+                } else {
+                    $query .= " ORDER BY p.created_at DESC";
+                }
+                break;
+        }
 
         $stm = $this->pdo->prepare($query);
 
@@ -32,9 +53,9 @@ class ProductService
     public function getOne($id)
     {
         $stm = $this->pdo->prepare("
-            SELECT *
-            FROM product
-            WHERE id = {$id}
+            SELECT p.*
+            FROM product p
+            WHERE p.id = {$id}
         ");
         $stm->execute();
 
@@ -70,6 +91,7 @@ class ProductService
                 {$body['category_id']}
             );
         ");
+
         if (!$stm->execute())
             return false;
 
@@ -131,7 +153,7 @@ class ProductService
         ");
         if (!$stm->execute())
             return false;
-        
+
         $stm = $this->pdo->prepare("DELETE FROM product WHERE id = {$id}");
         if (!$stm->execute())
             return false;
@@ -157,6 +179,20 @@ class ProductService
             SELECT *
             FROM product_log
             WHERE product_id = {$id}
+        ");
+        $stm->execute();
+
+        return $stm;
+    }
+
+    public function getLastLog($id)
+    {
+        $stm = $this->pdo->prepare("
+            SELECT *
+            FROM product_log
+            WHERE product_id = {$id}
+            ORDER BY timestamp ASC
+            LIMIT 1
         ");
         $stm->execute();
 

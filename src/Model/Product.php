@@ -6,6 +6,7 @@ class Product
 {
 
     public $category;
+    public $adminName;
 
     public function __construct(
         public int $id,
@@ -32,5 +33,9 @@ class Product
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+    public function setAdminName($adminName)
+    {
+        $this->adminName = $adminName;
     }
 }
